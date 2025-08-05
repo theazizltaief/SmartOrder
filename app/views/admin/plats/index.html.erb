@@ -1,0 +1,22 @@
+<h1>Liste des Plats / Boissons</h1>
+
+<%= link_to "➕ Nouveau plat", new_admin_plat_path, class: "btn" %>
+
+<div class="grid">
+  <% @plats.each do |plat| %>
+    <div class="card">
+      <% if plat.photo.attached? %>
+        <%= image_tag plat.photo, class: "card-img" %>
+      <% else %>
+        <p>(Aucune image)</p>
+      <% end %>
+      <h3><%= plat.nom %> - <%= plat.type_de_plat %></h3>
+      <p><%= plat.description %></p>
+      <strong><%= number_to_currency(plat.prix_en_centimes / 100.0, unit: "DT") %></strong>
+      <div class="actions">
+        <%= link_to "✏️ Modifier", edit_admin_plat_path(plat) %> |
+        <%= link_to "🗑️ Supprimer", admin_plat_path(plat), method: :delete, data: { confirm: "Supprimer ce plat ?" } %>
+      </div>
+    </div>
+  <% end %>
+</div>

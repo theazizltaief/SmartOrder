@@ -1,0 +1,43 @@
+<h1>Commandes reçues</h1>
+
+<table>
+  <thead>
+    <tr>
+      <th>Table</th>
+      <th>Heure</th>
+      <th>Plats</th>
+      <th>Statut</th>
+      <th>Action</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @commandes.each do |commande| %>
+      <tr>
+        <td><%= commande.table.numero %></td>
+        <td><%= l commande.created_at, format: :short %></td>
+        <td>
+          <ul>
+            <% commande.ligne_commandes.each do |lc| %>
+              <li>
+                <strong><%= lc.plat.nom %></strong>
+                (x<%= lc.quantite %>)
+                <% if lc.remarque.present? %>
+                  <br><em>Remarque : <%= lc.remarque %></em>
+                <% end %>
+              </li>
+            <% end %>
+          </ul>
+        </td>
+        <td>
+          <%= form_with model: [:admin, commande], method: :patch, local: true do |f| %>
+            <%= f.select :statut, ["en_attente", "envoyée", "servie"], {}, class: "statut-select" %>
+            <%= f.submit "Mettre à jour" %>
+          <% end %>
+        </td>
+        <td>
+          <%= link_to "Détail", admin_commande_path(commande) %>
+        </td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>

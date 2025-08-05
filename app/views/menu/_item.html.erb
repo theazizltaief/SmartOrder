@@ -1,0 +1,11 @@
+<div class="card">
+  <% if plat.photo.attached? %>
+    <%= image_tag plat.photo, class: "card-img" %>
+  <% end %>
+  <h3><%= plat.nom %></h3>
+  <p><%= plat.description %></p>
+  <p class="price"><%= number_to_currency(plat.prix_en_centimes / 100.0, unit: "DT") %></p>
+
+  <textarea placeholder="Remarque ?" data-panier-target="remarque"></textarea>
+  <button data-action="click->panier#ajouter" data-plat-id="<%= plat.id %>">Ajouter au panier</button>
+</div>

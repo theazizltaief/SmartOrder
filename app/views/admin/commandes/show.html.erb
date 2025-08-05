@@ -1,0 +1,19 @@
+<h2>Détail de la commande</h2>
+
+<p><strong>Table :</strong> <%= @commande.table.numero %></p>
+<p><strong>Statut :</strong> <%= @commande.statut %></p>
+<p><strong>Date :</strong> <%= l @commande.created_at, format: :long %></p>
+
+<h3>Contenu de la commande :</h3>
+<ul>
+  <% @commande.ligne_commandes.each do |lc| %>
+    <li>
+      <%= lc.plat.nom %> × <%= lc.quantite %>
+      <% if lc.remarque.present? %>
+        - <em><%= lc.remarque %></em>
+      <% end %>
+    </li>
+  <% end %>
+</ul>
+
+<%= link_to "Retour", admin_commandes_path, class: "btn" %>

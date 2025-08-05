@@ -1,0 +1,19 @@
+<h1>Bienvenue à SmartOrder</h1>
+
+<div class="menu-section">
+  <h2>🥘 Plats</h2>
+  <div class="grid">
+    <% @plats.each do |plat| %>
+      <%= render "item", plat: plat %>
+    <% end %>
+  </div>
+
+  <h2>🥤 Boissons</h2>
+  <div class="grid">
+    <% @boissons.each do |plat| %>
+      <%= render "item", plat: plat %>
+    <% end %>
+  </div>
+</div>
+
+<%= render "panier" %>
