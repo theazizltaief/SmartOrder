@@ -6,6 +6,7 @@ static targets = ["liste", "form", "json", "remarque"]
 connect() {
   this.commande = []
   this.majPanier()
+  console.log("stimilus panier connecté !")
 }
 
 ajouter(event) {

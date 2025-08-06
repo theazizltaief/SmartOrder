@@ -18,8 +18,7 @@
     <link rel="apple-touch-icon" href="/icon.png">
 
    
-
-    <%= javascript_importmap_tags %>
+    <%= javascript_include_tag "application", "data-turbo-track": "reload", type: "module" %>
     <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
 
   </head>
