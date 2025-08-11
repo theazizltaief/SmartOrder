@@ -1,11 +1,31 @@
 <div class="card">
   <% if plat.photo.attached? %>
-    <%= image_tag plat.photo, class: "card-img" %>
+    <%= image_tag plat.photo, class: "card-img", alt: plat.nom %>
+  <% else %>
+    <div class="card-img" style="background: linear-gradient(135deg, #f5f7fa, #c3cfe2); display: flex; align-items: center; justify-content: center; color: #7f8c8d; font-size: 2rem;">
+      <%= plat.type_de_plat == "Plat" ? "🍽️" : "🥤" %>
+    </div>
   <% end %>
+  
   <h3><%= plat.nom %></h3>
   <p><%= plat.description %></p>
-  <p class="price"><%= number_to_currency(plat.prix_en_centimes / 100.0, unit: "DT") %></p>
-
-  <textarea placeholder="Remarque ?" data-panier-target="remarque"></textarea>
-  <button data-action="click->panier#ajouter" data-plat-id="<%= plat.id %>">Ajouter au panier</button>
+  <p class="price"><%= format_price_dt(plat.prix_en_centimes) %></p>
+  
+  <div class="form-group">
+    <textarea 
+      class="form-control" 
+      placeholder="Remarques spéciales (ex: sans mayo, bien cuit...)"
+      rows="2"
+    ></textarea>
+  </div>
+  
+  <button 
+    class="btn btn-primary" 
+    style="width: 100%;"
+    data-action="click->panier#ajouter" 
+    data-plat-id="<%= plat.id %>"
+    data-plat-prix="<%= plat.prix_en_centimes %>"
+  >
+    ➕ Ajouter au panier
+  </button>
 </div>

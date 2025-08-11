@@ -1,0 +1,72 @@
+<div class="admin-header">
+  <h1>🍽️ Détails du Plat</h1>
+  <p>Informations complètes sur ce plat</p>
+</div>
+
+<!-- Actions rapides -->
+<div style="margin-bottom: 2rem;">
+  <%= link_to "← Retour aux plats", admin_plats_path, 
+      class: "btn btn-secondary" %>
+  <%= link_to "✏️ Modifier", edit_admin_plat_path(@plat), 
+      class: "btn btn-primary" %>
+  <%= link_to "🗑️ Supprimer", admin_plat_path(@plat), 
+      method: :delete,
+      class: "btn btn-danger", 
+      data: { 
+        confirm: "Êtes-vous sûr de vouloir supprimer ce plat ?" 
+      } %>
+</div>
+
+<!-- Détails du plat -->
+<div class="card" style="max-width: 600px;">
+  <% if @plat.photo.attached? %>
+    <%= image_tag @plat.photo, 
+        style: "width: 100%; height: 300px; object-fit: cover; border-radius: 10px; margin-bottom: 1rem;", 
+        alt: @plat.nom %>
+  <% else %>
+    <div style="width: 100%; height: 300px; background: linear-gradient(135deg, #f5f7fa, #c3cfe2); display: flex; align-items: center; justify-content: center; color: #7f8c8d; font-size: 4rem; border-radius: 10px; margin-bottom: 1rem;">
+      <%= @plat.type_de_plat == "Plat" ? "🍽️" : "🥤" %>
+    </div>
+  <% end %>
+  
+  <h2 style="color: #2c3e50; margin-bottom: 1rem;"><%= @plat.nom %></h2>
+  
+  <div style="margin-bottom: 1rem;">
+    <strong>Type :</strong>
+    <% if @plat.type_de_plat == 'Plat' %>
+      <span class="badge" style="background: #3498db; color: white; padding: 0.3rem 0.8rem; border-radius: 15px; margin-left: 0.5rem;">
+        🍽️ Plat
+      </span>
+    <% else %>
+      <span class="badge" style="background: #e67e22; color: white; padding: 0.3rem 0.8rem; border-radius: 15px; margin-left: 0.5rem;">
+        🥤 Boisson
+      </span>
+    <% end %>
+  </div>
+  
+  <div style="margin-bottom: 1rem;">
+    <strong>Prix :</strong>
+    <span style="font-size: 1.3rem; font-weight: 700; color: #e74c3c; margin-left: 0.5rem;">
+      <%= number_to_currency(@plat.prix_en_centimes / 100.0, unit: "", suffix: " DT") %>
+    </span>
+  </div>
+  
+  <div style="margin-bottom: 1rem;">
+    <strong>Description :</strong>
+    <p style="margin-top: 0.5rem; color: #7f8c8d; line-height: 1.6;">
+      <%= @plat.description %>
+    </p>
+  </div>
+  
+  <div style="margin-bottom: 1rem;">
+    <strong>Créé le :</strong>
+    <span style="color: #7f8c8d;"><%= @plat.created_at.strftime("%d/%m/%Y à %H:%M") %></span>
+  </div>
+  
+  <% if @plat.updated_at != @plat.created_at %>
+    <div style="margin-bottom: 1rem;">
+      <strong>Modifié le :</strong>
+      <span style="color: #7f8c8d;"><%= @plat.updated_at.strftime("%d/%m/%Y à %H:%M") %></span>
+    </div>
+  <% end %>
+</div>

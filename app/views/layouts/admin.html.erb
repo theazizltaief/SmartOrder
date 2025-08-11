@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>SmartOrder - Administration</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+    
+    <link rel="icon" href="/icon.png" type="image/png">
+    
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    
+    <%= javascript_include_tag "application", "data-turbo-track": "reload", type: "module" %>
+    <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
+    
+    <style>
+      .admin-navbar {
+        background: linear-gradient(135deg, #2c3e50, #34495e);
+        padding: 1rem 0;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 1000;
+        transition: transform 0.3s ease-in-out;
+      }
+      
+      .admin-navbar.hidden {
+        transform: translateY(-100%);
+      }
+      
+      /* Espace pour compenser la navbar fixe - AJUSTÉ */
+      body {
+        padding-top: 100px;
+      }
+      
+      .admin-navbar .container {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 1rem;
+        flex-wrap: wrap;
+        gap: 1rem;
+      }
+      
+      .admin-navbar h1 {
+        color: white;
+        margin: 0;
+        font-size: 1.5rem;
+        flex-shrink: 0;
+      }
+      
+      .admin-nav-links {
+        display: flex;
+        gap: 0.5rem;
+        align-items: center;
+        flex-wrap: wrap;
+      }
+      
+      .admin-nav-links a, .admin-nav-links button {
+        color: white;
+        text-decoration: none;
+        padding: 0.5rem 0.8rem;
+        border-radius: 5px;
+        transition: background 0.3s;
+        border: none;
+        background: none;
+        cursor: pointer;
+        font-size: 0.9rem;
+        white-space: nowrap;
+      }
+      
+      .admin-nav-links a:hover, .admin-nav-links button:hover {
+        background: rgba(255,255,255,0.1);
+      }
+      
+      .admin-nav-links a.active {
+        background: rgba(255,255,255,0.2);
+        font-weight: bold;
+      }
+      
+      .admin-user-info {
+        color: #bdc3c7;
+        font-size: 0.8rem;
+        padding: 0.5rem;
+        text-align: center;
+      }
+      
+      .logout-btn {
+        background: #e74c3c !important;
+        padding: 0.5rem 1rem;
+        border-radius: 5px;
+        font-size: 0.9rem;
+      }
+      
+      .logout-btn:hover {
+        background: #c0392b !important;
+      }
+      
+      .alert {
+        padding: 1rem;
+        border-radius: 5px;
+        margin-bottom: 1rem;
+      }
+      
+      .alert-success {
+        background: #d4edda;
+        color: #155724;
+        border: 1px solid #c3e6cb;
+      }
+      
+      .alert-danger {
+        background: #f8d7da;
+        color: #721c24;
+        border: 1px solid #f5c6cb;
+      }
+      
+      .breadcrumb {
+        background: rgba(255,255,255,0.9);
+        padding: 1rem;
+        border-radius: 8px;
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+      }
+      
+      .breadcrumb a {
+        color: #667eea;
+        text-decoration: none;
+      }
+      
+      .breadcrumb a:hover {
+        text-decoration: underline;
+      }
+      
+      .breadcrumb .separator {
+        color: #7f8c8d;
+      }
+      
+      /* Bouton flottant de déconnexion pour mobile */
+      .floating-logout {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        z-index: 1001;
+        display: none;
+      }
+      
+      /* RESPONSIVE AMÉLIORÉ */
+      @media (max-width: 1024px) {
+        .admin-nav-links a, .admin-nav-links button {
+          font-size: 0.8rem;
+          padding: 0.4rem 0.6rem;
+        }
+        
+        .admin-navbar h1 {
+          font-size: 1.3rem;
+        }
+      }
+      
+      @media (max-width: 768px) {
+        body {
+          padding-top: 140px; /* Plus d'espace sur mobile */
+        }
+        
+        .admin-navbar .container {
+          flex-direction: column;
+          align-items: stretch;
+          gap: 0.5rem;
+        }
+        
+        .admin-nav-links {
+          justify-content: center;
+          gap: 0.3rem;
+        }
+        
+        .admin-nav-links a, .admin-nav-links button {
+          font-size: 0.75rem;
+          padding: 0.3rem 0.5rem;
+        }
+        
+        .logout-btn {
+          display: none !important;
+        }
+        
+        .floating-logout {
+          display: block;
+        }
+        
+        .admin-user-info {
+          font-size: 0.7rem;
+          order: -1;
+        }
+        
+        .breadcrumb {
+          font-size: 0.9rem;
+        }
+      }
+      
+      @media (max-width: 480px) {
+        body {
+          padding-top: 160px; /* Encore plus d'espace sur très petit écran */
+        }
+        
+        .admin-nav-links {
+          flex-direction: column;
+          width: 100%;
+        }
+        
+        .admin-nav-links a, .admin-nav-links button {
+          text-align: center;
+          width: 100%;
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+    <nav class="admin-navbar" id="adminNavbar">
+      <div class="container">
+        <%= link_to admin_root_path, style: "text-decoration: none;" do %>
+          <h1>🛠️ SmartOrder Admin</h1>
+        <% end %>
+        
+        <div class="admin-nav-links">
+          <%= link_to "📊 Dashboard", admin_root_path, 
+              class: "#{'active' if controller_name == 'dashboard'}" %>
+          <%= link_to "📋 Commandes", admin_commandes_path, 
+              class: "#{'active' if controller_name == 'commandes'}" %>
+          <%= link_to "🍽️ Plats", admin_plats_path, 
+              class: "#{'active' if controller_name == 'plats'}" %>
+          <%= link_to "👁️ Site", root_path, target: "_blank" %>
+          
+          <div class="admin-user-info">
+            Connecté : <strong><%= current_admin_user.email %></strong>
+          </div>
+          
+          <%= button_to "🚪 Déconnexion", destroy_admin_user_session_path, 
+              method: :delete,
+              class: "logout-btn",
+              data: { 
+                confirm: "Êtes-vous sûr de vouloir vous déconnecter ?",
+                turbo: false
+              },
+              form: { style: "display: inline;" } %>
+        </div>
+      </div>
+    </nav>
+
+    <div class="floating-logout">
+      <%= button_to "🚪", destroy_admin_user_session_path, 
+          method: :delete,
+          class: "btn btn-danger",
+          style: "border-radius: 50%; width: 60px; height: 60px; font-size: 1.5rem;",
+          title: "Déconnexion",
+          data: { 
+            confirm: "Êtes-vous sûr de vouloir vous déconnecter ?",
+            turbo: false
+          },
+          form: { style: "display: inline;" } %>
+    </div>
+
+    <div class="container">
+      <div class="breadcrumb">
+        <%= link_to "🏠 Accueil Admin", admin_root_path %>
+        <span class="separator">></span>
+        <% case controller_name %>
+        <% when 'dashboard' %>
+          <span>📊 Dashboard</span>
+        <% when 'commandes' %>
+          <%= link_to "📋 Commandes", admin_commandes_path %>
+          <% if action_name == 'show' %>
+            <span class="separator">></span>
+            <span>Commande #<%= params[:id] %></span>
+          <% end %>
+        <% when 'plats' %>
+          <%= link_to "🍽️ Plats", admin_plats_path %>
+          <% if action_name == 'show' %>
+            <span class="separator">></span>
+            <span>Détails du plat</span>
+          <% elsif action_name == 'new' %>
+            <span class="separator">></span>
+            <span>Nouveau plat</span>
+          <% elsif action_name == 'edit' %>
+            <span class="separator">></span>
+            <span>Modifier le plat</span>
+          <% end %>
+        <% end %>
+      </div>
+
+      <% if notice %>
+        <div class="alert alert-success">
+          <%= notice %>
+        </div>
+      <% end %>
+      
+      <% if alert %>
+        <div class="alert alert-danger">
+          <%= alert %>
+        </div>
+      <% end %>
+
+      <%= yield %>
+    </div>
+
+    <script data-turbo-permanent>
+      // Éviter les redéclarations avec Turbo
+      if (!window.adminNavbarInitialized) {
+        window.adminNavbarInitialized = true;
+        
+        let lastScrollTop = 0;
+        const navbar = document.getElementById('adminNavbar');
+        
+        function handleScroll() {
+          let scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+          
+          if (scrollTop > lastScrollTop && scrollTop > 100) {
+            // Scroll vers le bas - cacher la navbar
+            navbar.classList.add('hidden');
+          } else {
+            // Scroll vers le haut - montrer la navbar
+            navbar.classList.remove('hidden');
+          }
+          
+          lastScrollTop = scrollTop;
+        }
+        
+        function handleMouseMove(e) {
+          if (e.clientY < 50) {
+            navbar.classList.remove('hidden');
+          }
+        }
+        
+        window.addEventListener('scroll', handleScroll);
+        document.addEventListener('mousemove', handleMouseMove);
+        
+        // Nettoyer les event listeners quand on quitte la page
+        document.addEventListener('turbo:before-visit', function() {
+          window.removeEventListener('scroll', handleScroll);
+          document.removeEventListener('mousemove', handleMouseMove);
+          window.adminNavbarInitialized = false;
+        });
+      }
+    </script>
+  </body>
+</html>

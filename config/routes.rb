@@ -1,19 +1,25 @@
 Rails.application.routes.draw do
-  get "commandes/create"
-  get "commandes/show"
-  get "menu/index"
+  # Devise pour les admins
+  devise_for :admin_users, path: "admin", path_names: {
+    sign_in: "login",
+    sign_out: "logout"
+  }
+
+  # Page d'accueil - Interface client (vitrine des plats)
   root "menu#index"
 
-  # Interface client
+  # Interface client publique
   get "/menu", to: "menu#index"
   resources :commandes, only: [ :create, :show ]
 
-  # Interface admin
+  # Interface admin protégée
   namespace :admin do
-    get "commandes/index"
-    get "commandes/show"
-    get "commandes/update"
+    root "dashboard#index"  # Cette ligne était manquante !
     resources :plats
-    resources :commandes, only: [ :index, :show, :update ]
+    resources :commandes, only: [ :index, :show, :update ] do
+      collection do
+        get :filter, path: "/", action: :index
+      end
+    end
   end
 end

@@ -1,30 +1,142 @@
-<%= form_with model: [:admin, @plat], local: true do |f| %>
-  <div>
-    <%= f.label :nom %><br>
-    <%= f.text_field :nom %>
+<%= form_with model: [:admin, plat], local: true do |f| %>
+  <% if plat.errors.any? %>
+    <div class="alert alert-danger">
+      <h4><%= pluralize(plat.errors.count, "erreur") %> :</h4>
+      <ul style="margin: 0; padding-left: 1.5rem;">
+        <% plat.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="form-group">
+    <%= f.label :nom, "Nom du plat", class: "form-label" %>
+    <%= f.text_field :nom, 
+        class: "form-control", 
+        placeholder: "Ex: Burger Classique, Coca-Cola...",
+        required: true %>
   </div>
 
-  <div>
-    <%= f.label :description %><br>
-    <%= f.text_area :description %>
+  <div class="form-group">
+    <%= f.label :type_de_plat, "Type", class: "form-label" %>
+    <%= f.select :type_de_plat, 
+        options_for_select([
+          ['🍽️ Plat', 'Plat'],
+          ['🥤 Boisson', 'Boisson']
+        ], plat.type_de_plat), 
+        { prompt: "Choisir un type..." },
+        { class: "form-control", required: true } %>
   </div>
 
-  <div>
-    <%= f.label :prix_en_centimes, "Prix (en dinars)" %><br>
-    <%= f.number_field :prix_en_centimes %>
+  <div class="form-group">
+    <%= f.label :prix_en_centimes, "Prix (en millimes)", class: "form-label" %>
+    <div style="display: flex; align-items: center; gap: 0.5rem;">
+      <%= f.number_field :prix_en_centimes, 
+          class: "form-control", 
+          placeholder: "Ex: 1500 pour 1.500 DT",
+          min: 0,
+          step: 1,
+          required: true,
+          style: "flex: 1;" %>
+      <span style="color: #7f8c8d; font-size: 0.9rem;">millimes</span>
+    </div>
+    <small style="color: #7f8c8d;">
+      Prix en millimes (ex: 1500 = 1.500 DT, 10500 = 10.500 DT)
+    </small>
+    <% if plat.prix_en_centimes.present? %>
+      <div style="margin-top: 0.5rem; padding: 0.5rem; background: #e8f5e8; border-radius: 5px;">
+        <strong>Aperçu :</strong> <%= format_price_dt(plat.prix_en_centimes) %>
+      </div>
+    <% end %>
   </div>
 
-  <div>
-    <%= f.label :type_de_plat %><br>
-    <%= f.select :type_de_plat, ["Plat", "Boisson"], include_blank: "Choisir..." %>
+  <div class="form-group">
+    <%= f.label :description, "Description", class: "form-label" %>
+    <%= f.text_area :description, 
+        class: "form-control", 
+        rows: 4,
+        placeholder: "Décrivez les ingrédients, la préparation...",
+        required: true %>
   </div>
 
-  <div>
-    <%= f.label :photo %><br>
-    <%= f.file_field :photo %>
+  <div class="form-group">
+    <%= f.label :photo, "Photo", class: "form-label" %>
+    <%= f.file_field :photo, 
+        class: "form-control", 
+        accept: "image/*" %>
+    <small style="color: #7f8c8d;">
+      Formats acceptés : JPG, PNG, GIF (optionnel)
+    </small>
+    
+    <% if plat.photo.attached? %>
+      <div style="margin-top: 1rem;">
+        <p style="color: #28a745; font-weight: 600;">📷 Photo actuelle :</p>
+        <%= image_tag plat.photo, 
+            style: "width: 150px; height: 100px; object-fit: cover; border-radius: 8px; border: 2px solid #e9ecef;" %>
+      </div>
+    <% end %>
   </div>
 
-  <div>
-    <%= f.submit %>
+  <div style="display: flex; gap: 1rem; margin-top: 2rem;">
+    <% submit_text = plat.persisted? ? "💾 Mettre à jour" : "➕ Créer le plat" %>
+    <%= f.submit submit_text, 
+        class: "btn btn-success", 
+        style: "flex: 1;" %>
+    <%= link_to "Annuler", admin_plats_path, 
+        class: "btn btn-secondary" %>
   </div>
 <% end %>
+
+<style>
+  .form-label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+    color: #2c3e50;
+  }
+  
+  .form-control {
+    width: 100%;
+    padding: 0.75rem;
+    border: 2px solid #e9ecef;
+    border-radius: 8px;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    background: rgba(255, 255, 255, 0.9);
+  }
+  
+  .form-control:focus {
+    outline: none;
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+  }
+  
+  .form-group {
+    margin-bottom: 1.5rem;
+  }
+</style>
+
+<script>
+// Aperçu du prix en temps réel
+document.addEventListener('DOMContentLoaded', function() {
+  const prixInput = document.querySelector('#plat_prix_en_centimes');
+  if (prixInput) {
+    prixInput.addEventListener('input', function() {
+      const millimes = parseInt(this.value) || 0;
+      const dinars = millimes / 1000.0;
+      const preview = document.querySelector('.prix-preview');
+      
+      if (!preview) {
+        const previewDiv = document.createElement('div');
+        previewDiv.className = 'prix-preview';
+        previewDiv.style.cssText = 'margin-top: 0.5rem; padding: 0.5rem; background: #e8f5e8; border-radius: 5px;';
+        this.parentNode.parentNode.appendChild(previewDiv);
+      }
+      
+      const previewElement = document.querySelector('.prix-preview');
+      previewElement.innerHTML = `<strong>Aperçu :</strong> ${dinars.toFixed(3)} DT`;
+    });
+  }
+});
+</script>

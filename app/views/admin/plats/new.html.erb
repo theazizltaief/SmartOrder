@@ -1,2 +1,15 @@
-<h2>Nouveau plat</h2>
-<%= render "form" %>
+<div class="admin-header">
+  <h1>➕ Nouveau Plat</h1>
+  <p>Ajouter un nouveau plat au menu</p>
+</div>
+
+<!-- Actions rapides -->
+<div style="margin-bottom: 2rem;">
+  <%= link_to "← Retour aux plats", admin_plats_path, 
+      class: "btn btn-secondary" %>
+</div>
+
+<!-- Formulaire -->
+<div class="card" style="max-width: 600px;">
+  <%= render 'form', plat: @plat %>
+</div>

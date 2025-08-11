@@ -186,3 +186,8 @@ esbuild@^0.25.8:
     "@esbuild/win32-arm64" "0.25.8"
     "@esbuild/win32-ia32" "0.25.8"
     "@esbuild/win32-x64" "0.25.8"
+
+sweetalert2@^11.22.3:
+  version "11.22.3"
+  resolved "https://registry.yarnpkg.com/sweetalert2/-/sweetalert2-11.22.3.tgz#0bb19be374b4bf7d8726dfcaf1f6abdf3b8114b6"
+  integrity sha512-//WtZEvs9XRmyQVs77tz02ERu2JUTATQvrec+MjJYtKtnYSYDDgAmDdWzRWMkcxClj828EQgfHrpM+tI6qcMOg==

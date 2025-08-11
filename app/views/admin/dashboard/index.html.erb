@@ -1,0 +1,104 @@
+<div class="admin-header">
+  <h1>📊 Dashboard SmartOrder</h1>
+  <p>Vue d'ensemble de votre restaurant</p>
+</div>
+
+<div class="stats-grid">
+  <div class="stat-card">
+    <div class="stat-number" style="color: #3498db;"><%= @stats[:total_commandes] %></div>
+    <div class="stat-label">Total commandes</div>
+  </div>
+  
+  <div class="stat-card">
+    <div class="stat-number" style="color: #f39c12;"><%= @stats[:commandes_en_attente] %></div>
+    <div class="stat-label">En attente</div>
+  </div>
+  
+  <div class="stat-card">
+    <div class="stat-number" style="color: #e74c3c;"><%= @stats[:commandes_en_preparation] %></div>
+    <div class="stat-label">En préparation</div>
+  </div>
+  
+  <div class="stat-card">
+    <div class="stat-number" style="color: #27ae60;"><%= @stats[:commandes_prete] %></div>
+    <div class="stat-label">Prêtes</div>
+  </div>
+  
+  <div class="stat-card">
+    <div class="stat-number" style="color: #95a5a6;"><%= @stats[:commandes_servie] %></div>
+    <div class="stat-label">Servies</div>
+  </div>
+  
+  <div class="stat-card">
+    <div class="stat-number" style="color: #9b59b6;"><%= @stats[:total_plats] %></div>
+    <div class="stat-label">Plats au menu</div>
+  </div>
+  
+  <div class="stat-card">
+    <div class="stat-number" style="color: #16a085;"><%= number_to_currency(@stats[:chiffre_affaires_jour], unit: "", suffix: " DT") %></div>
+    <div class="stat-label">CA aujourd'hui</div>
+  </div>
+</div>
+
+<div style="margin: 2rem 0;">
+  <h2>🚀 Actions rapides</h2>
+  <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+    <%= link_to "📋 Voir toutes les commandes", admin_commandes_path, 
+        class: "btn btn-primary" %>
+    <%= link_to "⏰ Commandes en attente", admin_commandes_path(statut: 'en_attente'), 
+        class: "btn btn-secondary" %>
+    <%= link_to "🍽️ Gérer les plats", admin_plats_path, 
+        class: "btn btn-secondary" %>
+    <%= link_to "➕ Nouveau plat", new_admin_plat_path, 
+        class: "btn btn-success" %>
+  </div>
+</div>
+
+<div class="recent-orders">
+  <h2>📋 Commandes récentes</h2>
+  
+  <% if @recent_commandes.any? %>
+    <div class="commandes-list">
+      <% @recent_commandes.each do |commande| %>
+        <div class="commande-card" style="margin-bottom: 1rem;">
+          <div class="commande-header">
+            <div class="commande-info">
+              <h3>Commande #<%= commande.id %> - Table <%= commande.table.numero %></h3>
+              <div class="commande-meta">
+                📅 <%= l commande.created_at, format: :short %>
+                • 💰 <%= number_to_currency(commande.ligne_commandes.sum { |lc| lc.plat.prix_en_centimes * lc.quantite } / 100.0, unit: "", suffix: " DT") %>
+              </div>
+            </div>
+            <div class="status-badge status-<%= commande.statut %>">
+              <%= commande.statut.humanize %>
+            </div>
+          </div>
+          
+          <div style="margin-top: 1rem;">
+            <%= link_to "👁️ Voir détails", admin_commande_path(commande), 
+                class: "btn btn-secondary btn-sm" %>
+          </div>
+        </div>
+      <% end %>
+    </div>
+    
+    <div style="text-align: center; margin-top: 1rem;">
+      <%= link_to "Voir toutes les commandes →", admin_commandes_path, 
+          class: "btn btn-primary" %>
+    </div>
+  <% else %>
+    <div class="commande-card" style="text-align: center; padding: 2rem;">
+      <h3 style="color: #7f8c8d;">Aucune commande pour le moment</h3>
+      <p style="color: #bdc3c7;">Les nouvelles commandes apparaîtront ici</p>
+    </div>
+  <% end %>
+</div>
+
+<script>
+// Auto-refresh du dashboard toutes les 60 secondes
+setInterval(() => {
+  if (document.visibilityState === 'visible') {
+    window.location.reload()
+  }
+}, 60000)
+</script>

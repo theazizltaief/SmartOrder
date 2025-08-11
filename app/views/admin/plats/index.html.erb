@@ -1,22 +1,65 @@
-<h1>Liste des Plats / Boissons</h1>
+<div class="admin-header">
+  <h1>🍽️ Gestion des Plats</h1>
+  <p>Menu de votre restaurant</p>
+</div>
 
-<%= link_to "➕ Nouveau plat", new_admin_plat_path, class: "btn" %>
+<!-- Actions -->
+<div style="margin-bottom: 2rem; display: flex; justify-content: space-between; align-items: center;">
+  <div>
+    <%= link_to "➕ Nouveau plat", new_admin_plat_path, 
+        class: "btn btn-success" %>
+  </div>
+  
+  <div>
+    <span style="color: #7f8c8d;">
+      Total : <%= @plats.count %> plats
+    </span>
+  </div>
+</div>
 
-<div class="grid">
+<!-- Liste des plats -->
+<div class="items-grid">
   <% @plats.each do |plat| %>
     <div class="card">
       <% if plat.photo.attached? %>
-        <%= image_tag plat.photo, class: "card-img" %>
+        <%= image_tag plat.photo, class: "card-img", alt: plat.nom %>
       <% else %>
-        <p>(Aucune image)</p>
+        <div class="card-img" style="background: linear-gradient(135deg, #f5f7fa, #c3cfe2); display: flex; align-items: center; justify-content: center; color: #7f8c8d; font-size: 2rem;">
+          <%= plat.type_de_plat == "Plat" ? "🍽️" : "🥤" %>
+        </div>
       <% end %>
-      <h3><%= plat.nom %> - <%= plat.type_de_plat %></h3>
+      
+      <h3><%= plat.nom %></h3>
       <p><%= plat.description %></p>
-      <strong><%= number_to_currency(plat.prix_en_centimes / 100.0, unit: "DT") %></strong>
-      <div class="actions">
-        <%= link_to "✏️ Modifier", edit_admin_plat_path(plat) %> |
-        <%= link_to "🗑️ Supprimer", admin_plat_path(plat), method: :delete, data: { confirm: "Supprimer ce plat ?" } %>
+      <p class="price"><%= format_price_dt(plat.prix_en_centimes) %></p>
+      
+      <div style="display: flex; gap: 0.5rem; margin-top: 1rem;">
+        <%= link_to "👁️", admin_plat_path(plat), 
+            class: "btn btn-secondary btn-sm", 
+            title: "Voir" %>
+        <%= link_to "✏️", edit_admin_plat_path(plat), 
+            class: "btn btn-primary btn-sm", 
+            title: "Modifier" %>
+        <%= button_to "🗑️", admin_plat_path(plat), 
+            method: :delete,
+            class: "btn btn-danger btn-sm", 
+            title: "Supprimer",
+            data: { 
+              confirm: "Êtes-vous sûr de vouloir supprimer '#{plat.nom}' ?",
+              turbo: false
+            },
+            form: { style: "display: inline;" } %>
       </div>
     </div>
   <% end %>
 </div>
+
+<% if @plats.empty? %>
+  <div class="card" style="text-align: center; padding: 3rem;">
+    <h3 style="color: #7f8c8d;">Aucun plat dans le menu</h3>
+    <p style="color: #bdc3c7;">Commencez par ajouter des plats à votre menu</p>
+    <%= link_to "➕ Ajouter le premier plat", new_admin_plat_path, 
+        class: "btn btn-success", 
+        style: "margin-top: 1rem;" %>
+  </div>
+<% end %>

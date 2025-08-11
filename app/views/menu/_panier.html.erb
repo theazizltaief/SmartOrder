@@ -1,12 +1,31 @@
-<div data-controller="panier">
-  <h2>🛒 Votre commande</h2>
-  <ul data-panier-target="liste"></ul>
-
-<form data-panier-target="form" data-action="submit->panier#submit" action="/commandes" method="post">
-    <%= hidden_field_tag :authenticity_token, form_authenticity_token %>
-    <%= hidden_field_tag "commande[table_id]", 1 %>
-    <input type="hidden" name="commande[ligne_commandes_attributes]" data-panier-target="json" />
-    <button type="submit">Envoyer la commande</button>
-  </form>
+<div class="panier-card">
+  <div class="panier-header">
+    🛒 Votre commande
+    <span class="badge" data-panier-target="count">0</span>
+  </div>
+  
+  <div data-panier-target="liste">
+    <!-- Les articles du panier seront ajoutés ici par JavaScript -->
+  </div>
+  
+  <div class="panier-total">
+    <div class="total-amount">
+      Total: <span data-panier-target="total">0.00 DT</span>
+    </div>
+    
+    <%= form_with url: commandes_path, method: :post, 
+        data: { 
+          action: "submit->panier#submit" 
+        }, 
+        class: "panier-form" do |f| %>
+      
+      <%= f.hidden_field "commande[table_id]", value: 1 %>
+      <%= f.hidden_field "commande[ligne_commandes_attributes]", 
+          data: { panier_target: "json" } %>
+      
+      <%= f.submit "🍽️ Envoyer la commande", 
+          class: "btn btn-success", 
+          style: "width: 100%; font-size: 1.1rem; padding: 1rem;" %>
+    <% end %>
+  </div>
 </div>
-

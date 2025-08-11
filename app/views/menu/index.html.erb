@@ -1,19 +1,60 @@
-<h1>Bienvenue à SmartOrder</h1>
-
-<div class="menu-section">
-  <h2>🥘 Plats</h2>
-  <div class="grid">
-    <% @plats.each do |plat| %>
-      <%= render "item", plat: plat %>
-    <% end %>
-  </div>
-
-  <h2>🥤 Boissons</h2>
-  <div class="grid">
-    <% @boissons.each do |plat| %>
-      <%= render "item", plat: plat %>
-    <% end %>
-  </div>
+<div class="header">
+  <h1>🍽️ SmartOrder</h1>
+  <p>Commandez facilement depuis votre table</p>
 </div>
 
-<%= render "panier" %>
+<div class="menu-grid" data-controller="panier">
+  <!-- Section des plats -->
+  <div class="menu-content">
+    <!-- Navigation par onglets -->
+    <div class="nav-tabs">
+      <button class="nav-tab active" onclick="showTab('plats', this)">
+        🥘 Plats (<%= @plats.count %>)
+      </button>
+      <button class="nav-tab" onclick="showTab('boissons', this)">
+        🥤 Boissons (<%= @boissons.count %>)
+      </button>
+    </div>
+
+    <!-- Plats -->
+    <div id="plats-tab" class="tab-content active">
+      <div class="items-grid">
+        <% @plats.each do |plat| %>
+          <%= render "item", plat: plat %>
+        <% end %>
+      </div>
+    </div>
+
+    <!-- Boissons -->
+    <div id="boissons-tab" class="tab-content">
+      <div class="items-grid">
+        <% @boissons.each do |plat| %>
+          <%= render "item", plat: plat %>
+        <% end %>
+      </div>
+    </div>
+  </div>
+
+  <!-- Panier -->
+  <%= render "panier" %>
+</div>
+
+<script>
+function showTab(tabName, element) {
+  // Cacher tous les onglets
+  document.querySelectorAll('.tab-content').forEach(tab => {
+    tab.classList.remove('active')
+  })
+  
+  // Retirer la classe active de tous les boutons
+  document.querySelectorAll('.nav-tab').forEach(tab => {
+    tab.classList.remove('active')
+  })
+  
+  // Afficher l'onglet sélectionné
+  document.getElementById(tabName + '-tab').classList.add('active')
+  
+  // Ajouter la classe active au bouton cliqué
+  element.classList.add('active')
+}
+</script>

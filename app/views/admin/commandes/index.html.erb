@@ -1,43 +1,150 @@
-<h1>Commandes reçues</h1>
+<div class="admin-header">
+  <h1>📋 Gestion des Commandes</h1>
+  <p>Interface d'administration - SmartOrder</p>
+</div>
 
-<table>
-  <thead>
-    <tr>
-      <th>Table</th>
-      <th>Heure</th>
-      <th>Plats</th>
-      <th>Statut</th>
-      <th>Action</th>
-    </tr>
-  </thead>
-  <tbody>
+<!-- Statistiques -->
+<div class="stats-grid">
+  <div class="stat-card">
+    <div class="stat-number" style="color: #f39c12;"><%= @commandes.where(statut: 'en_attente').count %></div>
+    <div class="stat-label">En attente</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-number" style="color: #3498db;"><%= @commandes.where(statut: 'en_preparation').count %></div>
+    <div class="stat-label">En préparation</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-number" style="color: #27ae60;"><%= @commandes.where(statut: 'prete').count %></div>
+    <div class="stat-label">Prêtes</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-number" style="color: #95a5a6;"><%= @commandes.where(statut: 'servie').count %></div>
+    <div class="stat-label">Servies</div>
+  </div>
+</div>
+
+<!-- Filtres -->
+<div style="margin-bottom: 2rem;">
+  <div class="nav-tabs">
+    <%= link_to "Toutes", admin_commandes_path, 
+        class: "nav-tab #{'active' if params[:statut].blank?}" %>
+    <%= link_to "En attente", admin_commandes_path(statut: 'en_attente'), 
+        class: "nav-tab #{'active' if params[:statut] == 'en_attente'}" %>
+    <%= link_to "En préparation", admin_commandes_path(statut: 'en_preparation'), 
+        class: "nav-tab #{'active' if params[:statut] == 'en_preparation'}" %>
+    <%= link_to "Prêtes", admin_commandes_path(statut: 'prete'), 
+        class: "nav-tab #{'active' if params[:statut] == 'prete'}" %>
+    <%= link_to "Servies", admin_commandes_path(statut: 'servie'), 
+        class: "nav-tab #{'active' if params[:statut] == 'servie'}" %>
+  </div>
+</div>
+
+<!-- Bouton de rafraîchissement -->
+<div style="margin-bottom: 1rem; text-align: right;">
+  <%= button_to "🔄 Actualiser", admin_commandes_path, 
+      method: :get, 
+      class: "btn btn-secondary",
+      form: { style: "display: inline;" } %>
+</div>
+
+<!-- Liste des commandes -->
+<div class="commandes-list">
+  <% if @commandes.any? %>
     <% @commandes.each do |commande| %>
-      <tr>
-        <td><%= commande.table.numero %></td>
-        <td><%= l commande.created_at, format: :short %></td>
-        <td>
-          <ul>
-            <% commande.ligne_commandes.each do |lc| %>
-              <li>
-                <strong><%= lc.plat.nom %></strong>
-                (x<%= lc.quantite %>)
+      <div class="commande-card">
+        <div class="commande-header">
+          <div class="commande-info">
+            <h3>Commande #<%= commande.id %> - Table <%= commande.table.numero %></h3>
+            <div class="commande-meta">
+              📅 <%= l commande.created_at, format: :short %>
+              • 💰 <%= format_price_dt(commande.ligne_commandes.sum { |lc| lc.plat.prix_en_centimes * lc.quantite }) %>
+            </div>
+          </div>
+          <div class="status-badge status-<%= commande.statut %>">
+            <%= commande.statut.humanize %>
+          </div>
+        </div>
+
+        <div class="commande-content">
+          <% commande.ligne_commandes.each do |lc| %>
+            <div class="ligne-commande">
+              <div class="ligne-commande-info">
+                <strong><%= lc.plat.nom %></strong> × <%= lc.quantite %>
                 <% if lc.remarque.present? %>
-                  <br><em>Remarque : <%= lc.remarque %></em>
+                  <br><em style="color: #7f8c8d;">💬 <%= lc.remarque %></em>
                 <% end %>
-              </li>
-            <% end %>
-          </ul>
-        </td>
-        <td>
-          <%= form_with model: [:admin, commande], method: :patch, local: true do |f| %>
-            <%= f.select :statut, ["en_attente", "envoyée", "servie"], {}, class: "statut-select" %>
-            <%= f.submit "Mettre à jour" %>
+              </div>
+              <div class="ligne-commande-prix">
+                <%= format_price_dt(lc.plat.prix_en_centimes * lc.quantite) %>
+              </div>
+            </div>
           <% end %>
-        </td>
-        <td>
-          <%= link_to "Détail", admin_commande_path(commande) %>
-        </td>
-      </tr>
+        </div>
+
+        <div class="commande-actions" style="margin-top: 1rem; display: flex; gap: 1rem; align-items: center;">
+          <%= form_with model: [:admin, commande], method: :patch, local: true, 
+              style: "flex: 1;", 
+              class: "commande-update-form" do |f| %>
+            <div style="display: flex; gap: 0.5rem; align-items: center;">
+              <%= f.select :statut, 
+                  options_for_select([
+                    ['En attente', 'en_attente'],
+                    ['En préparation', 'en_preparation'], 
+                    ['Prête', 'prete'],
+                    ['Servie', 'servie']
+                  ], commande.statut), 
+                  {}, 
+                  { class: "form-control", style: "width: auto;" } %>
+              <%= f.submit "Mettre à jour", class: "btn btn-primary" %>
+            </div>
+          <% end %>
+          
+          <%= link_to "👁️ Détails", admin_commande_path(commande), 
+              class: "btn btn-secondary" %>
+        </div>
+      </div>
     <% end %>
-  </tbody>
-</table>
+  <% else %>
+    <div class="commande-card" style="text-align: center; padding: 3rem;">
+      <h3 style="color: #7f8c8d;">Aucune commande trouvée</h3>
+      <p style="color: #bdc3c7;">Les nouvelles commandes apparaîtront ici</p>
+    </div>
+  <% end %>
+</div>
+
+<script>
+// Auto-refresh toutes les 30 secondes
+setInterval(() => {
+  if (document.visibilityState === 'visible') {
+    window.location.reload()
+  }
+}, 30000)
+
+// Confirmation pour les changements de statut
+document.addEventListener('DOMContentLoaded', function() {
+  document.querySelectorAll('.commande-update-form').forEach(form => {
+    form.addEventListener('submit', function(e) {
+      e.preventDefault()
+      
+      const select = form.querySelector('select')
+      const commandeId = form.action.split('/').pop()
+      const newStatus = select.options[select.selectedIndex].text
+      
+      Swal.fire({
+        title: 'Confirmer le changement',
+        text: `Changer le statut de la commande #${commandeId} vers "${newStatus}" ?`,
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonText: 'Confirmer',
+        cancelButtonText: 'Annuler',
+        confirmButtonColor: '#28a745',
+        cancelButtonColor: '#dc3545'
+      }).then((result) => {
+        if (result.isConfirmed) {
+          form.submit()
+        }
+      })
+    })
+  })
+})
+</script>

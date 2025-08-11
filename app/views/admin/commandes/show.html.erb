@@ -1,19 +1,101 @@
-<h2>Détail de la commande</h2>
+<div class="admin-header">
+  <h1>📋 Détails de la Commande #<%= @commande.id %></h1>
+  <p>Table <%= @commande.table.numero %> • <%= l @commande.created_at, format: :long %></p>
+</div>
 
-<p><strong>Table :</strong> <%= @commande.table.numero %></p>
-<p><strong>Statut :</strong> <%= @commande.statut %></p>
-<p><strong>Date :</strong> <%= l @commande.created_at, format: :long %></p>
-
-<h3>Contenu de la commande :</h3>
-<ul>
-  <% @commande.ligne_commandes.each do |lc| %>
-    <li>
-      <%= lc.plat.nom %> × <%= lc.quantite %>
-      <% if lc.remarque.present? %>
-        - <em><%= lc.remarque %></em>
-      <% end %>
-    </li>
+<!-- Actions rapides -->
+<div style="margin-bottom: 2rem;">
+  <%= link_to "← Retour aux commandes", admin_commandes_path, 
+      class: "btn btn-secondary" %>
+  
+  <% if @commande.statut != 'servie' %>
+    <%= form_with model: [:admin, @commande], method: :patch, 
+        style: "display: inline-block; margin-left: 1rem;" do |f| %>
+      <%= f.select :statut, 
+          options_for_select([
+            ['En attente', 'en_attente'],
+            ['En préparation', 'en_preparation'], 
+            ['Prête', 'prete'],
+            ['Servie', 'servie']
+          ], @commande.statut), 
+          {}, 
+          { class: "form-control", style: "width: auto; display: inline-block;" } %>
+      <%= f.submit "Mettre à jour", class: "btn btn-primary", style: "margin-left: 0.5rem;" %>
+    <% end %>
   <% end %>
-</ul>
+</div>
 
-<%= link_to "Retour", admin_commandes_path, class: "btn" %>
+<!-- Informations de la commande -->
+<div class="commande-card">
+  <div class="commande-header">
+    <div class="commande-info">
+      <h3>Commande #<%= @commande.id %> - Table <%= @commande.table.numero %></h3>
+      <div class="commande-meta">
+        📅 <%= l @commande.created_at, format: :short %>
+        • 💰 <%= number_to_currency(@commande.ligne_commandes.sum { |lc| lc.plat.prix_en_centimes * lc.quantite } / 100.0, unit: "", suffix: " DT") %>
+      </div>
+    </div>
+    <div class="status-badge status-<%= @commande.statut %>">
+      <%= @commande.statut.humanize %>
+    </div>
+  </div>
+
+  <div class="commande-content">
+    <h4 style="margin-bottom: 1rem;">Articles commandés :</h4>
+    <% @commande.ligne_commandes.each do |lc| %>
+      <div class="ligne-commande">
+        <div class="ligne-commande-info">
+          <strong><%= lc.plat.nom %></strong> × <%= lc.quantite %>
+          <br>
+          <small style="color: #7f8c8d;"><%= lc.plat.description %></small>
+          <% if lc.remarque.present? %>
+            <br><em style="color: #e74c3c;">💬 <%= lc.remarque %></em>
+          <% end %>
+        </div>
+        <div class="ligne-commande-prix">
+          <%= number_to_currency((lc.plat.prix_en_centimes * lc.quantite) / 100.0, unit: "", suffix: " DT") %>
+          <br>
+          <small style="color: #7f8c8d;">
+            <%= number_to_currency(lc.plat.prix_en_centimes / 100.0, unit: "", suffix: " DT") %> × <%= lc.quantite %>
+          </small>
+        </div>
+      </div>
+    <% end %>
+    
+    <div style="border-top: 2px solid #e9ecef; margin-top: 1rem; padding-top: 1rem; text-align: right;">
+      <h3 style="color: #e74c3c;">
+        Total : <%= number_to_currency(@commande.ligne_commandes.sum { |lc| lc.plat.prix_en_centimes * lc.quantite } / 100.0, unit: "", suffix: " DT") %>
+      </h3>
+    </div>
+  </div>
+</div>
+
+<script>
+// Confirmation pour les changements de statut
+document.addEventListener('DOMContentLoaded', function() {
+  const form = document.querySelector('form[action*="commandes"]')
+  if (form) {
+    form.addEventListener('submit', function(e) {
+      e.preventDefault()
+      
+      const select = form.querySelector('select')
+      const newStatus = select.options[select.selectedIndex].text
+      
+      Swal.fire({
+        title: 'Confirmer le changement',
+        text: `Changer le statut vers "${newStatus}" ?`,
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonText: 'Confirmer',
+        cancelButtonText: 'Annuler',
+        confirmButtonColor: '#28a745',
+        cancelButtonColor: '#dc3545'
+      }).then((result) => {
+        if (result.isConfirmed) {
+          form.submit()
+        }
+      })
+    })
+  }
+})
+</script>
