@@ -32,7 +32,10 @@ class Admin::CommandesController < Admin::BaseController
     @commande = Commande.includes(:table, ligne_commandes: :plat).find(params[:id])
   end
 
-  def commande_params
-    params.require(:commande).permit(:statut)
-  end
+def commande_params
+  params.require(:commande).permit(
+    :table_id,
+    ligne_commandes_attributes: [ :plat_id, :quantite, :remarque, :sauces, :legumes, :supplements ]
+  )
+end
 end

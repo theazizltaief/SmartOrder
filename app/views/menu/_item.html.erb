@@ -10,12 +10,55 @@
   <h3><%= plat.nom %></h3>
   <p><%= plat.description %></p>
   <p class="price"><%= format_price_dt(plat.prix_en_centimes) %></p>
-  
+
+  <% if plat.sauces.any? %>
+    <div class="form-group">
+      <label>Sauces :</label>
+      <% plat.sauces.each do |sauce| %>
+        <div>
+          <label>
+            <input type="checkbox" name="sauces[]" value="<%= sauce %>">
+            <%= sauce %>
+          </label>
+        </div>
+      <% end %>
+    </div>
+  <% end %>
+
+  <% if plat.legumes.any? %>
+    <div class="form-group">
+      <label>Légumes :</label>
+      <% plat.legumes.each do |legume| %>
+        <div>
+          <label>
+            <input type="checkbox" name="legumes[]" value="<%= legume %>">
+            <%= legume %>
+          </label>
+        </div>
+      <% end %>
+    </div>
+  <% end %>
+
+  <% if plat.supplements.any? %>
+    <div class="form-group">
+      <label>Suppléments :</label>
+      <% plat.supplements.each do |supplement| %>
+        <div>
+          <label>
+            <input type="checkbox" name="supplements[]" value="<%= supplement %>">
+            <%= supplement %>
+          </label>
+        </div>
+      <% end %>
+    </div>
+  <% end %>
+
   <div class="form-group">
     <textarea 
       class="form-control" 
       placeholder="Remarques spéciales (ex: sans mayo, bien cuit...)"
       rows="2"
+      name="remarques"
     ></textarea>
   </div>
   

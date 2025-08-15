@@ -565,3 +565,11 @@ textarea.form-control {
     opacity: 0;
   }
 }
+
+/* partie de nouveaux tags */
+.tags-container { display:flex; flex-wrap:wrap; gap:6px; margin-top:6px; }
+.tag { background:#e2e8f0; border-radius:12px; padding:4px 8px; display:inline-flex; align-items:center; font-size:14px; }
+.tag button { all:unset; margin-left:6px; cursor:pointer; }
+@media (max-width: 480px) {
+  .tag { font-size:12px; padding:3px 6px; }
+}

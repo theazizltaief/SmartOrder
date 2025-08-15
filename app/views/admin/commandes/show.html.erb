@@ -51,6 +51,17 @@
           <% if lc.remarque.present? %>
             <br><em style="color: #e74c3c;">💬 <%= lc.remarque %></em>
           <% end %>
+
+          <!-- Affichage des options -->
+          <% if lc.sauces.present? %>
+            <br><strong>Sauces :</strong> <%= lc.sauces.join(", ") %>
+          <% end %>
+          <% if lc.legumes.present? %>
+            <br><strong>Légumes :</strong> <%= lc.legumes.join(", ") %>
+          <% end %>
+          <% if lc.supplements.present? %>
+            <br>➕ <strong>Suppléments :</strong> <%= lc.supplements.join(", ") %>
+          <% end %>
         </div>
         <div class="ligne-commande-prix">
           <%= number_to_currency((lc.plat.prix_en_centimes * lc.quantite) / 100.0, unit: "", suffix: " DT") %>
@@ -71,16 +82,13 @@
 </div>
 
 <script>
-// Confirmation pour les changements de statut
 document.addEventListener('DOMContentLoaded', function() {
   const form = document.querySelector('form[action*="commandes"]')
   if (form) {
     form.addEventListener('submit', function(e) {
       e.preventDefault()
-      
       const select = form.querySelector('select')
       const newStatus = select.options[select.selectedIndex].text
-      
       Swal.fire({
         title: 'Confirmer le changement',
         text: `Changer le statut vers "${newStatus}" ?`,

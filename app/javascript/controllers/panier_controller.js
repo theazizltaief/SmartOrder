@@ -40,6 +40,10 @@ export default class extends Controller {
     const platNom = card.querySelector("h3")?.textContent?.trim() || "Plat inconnu"
     const remarqueField = card.querySelector("textarea")
     const remarque = remarqueField?.value?.trim() || ""
+    // Récupérer les options sélectionnées
+    const sauces = Array.from(card.querySelectorAll('input[name="sauces[]"]:checked')).map(i => i.value);
+    const legumes = Array.from(card.querySelectorAll('input[name="legumes[]"]:checked')).map(i => i.value);
+    const supplements = Array.from(card.querySelectorAll('input[name="supplements[]"]:checked')).map(i => i.value);
 
     console.log("Ajout:", { platId, platNom, platPrixCentimes, remarque })
 
@@ -49,6 +53,9 @@ export default class extends Controller {
     if (existingIndex >= 0) {
       // Augmenter la quantité
       window.smartOrderPanier[existingIndex].quantite += 1
+      window.smartOrderPanier[existingIndex].sauces = sauces;
+      window.smartOrderPanier[existingIndex].legumes = legumes;
+      window.smartOrderPanier[existingIndex].supplements = supplements;
       if (remarque) {
         window.smartOrderPanier[existingIndex].remarque = remarque
       }
@@ -60,6 +67,9 @@ export default class extends Controller {
         remarque: remarque,
         nom: platNom,
         prix_centimes: platPrixCentimes,
+        sauces: sauces,
+        legumes: legumes,
+        supplements: supplements
       })
     }
 
@@ -179,6 +189,9 @@ export default class extends Controller {
         plat_id: item.plat_id,
         quantite: item.quantite,
         remarque: item.remarque || "",
+        sauces: item.sauces || [],
+        legumes: item.legumes || [],
+        supplements: item.supplements || []
       }))
       this.jsonTarget.value = JSON.stringify(cleanData)
       console.log("JSON pour envoi:", this.jsonTarget.value)

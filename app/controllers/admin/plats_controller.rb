@@ -65,6 +65,7 @@ class Admin::PlatsController < Admin::BaseController
   end
 
   def plat_params
-    params.require(:plat).permit(:nom, :description, :prix_en_centimes, :type_de_plat, :photo)
+    params.require(:plat).permit(:nom, :description, :prix_en_centimes, :type_de_plat, :photo,
+    sauces: [], legumes: [], supplements: [])
   end
 end

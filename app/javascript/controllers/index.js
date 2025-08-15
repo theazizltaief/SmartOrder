@@ -3,9 +3,9 @@
 // ./bin/rails generate stimulus controllerName
 
 import { application } from "./application"
-
 import panier_controller from "./panier_controller"
-import HelloController from "./hello_controller"
-application.register("hello", HelloController)
+import tags_controller from "./tags_controller"
+
 application.register("panier", panier_controller)
+application.register("tags", tags_controller)
 
