@@ -1,5 +1,5 @@
 class Admin::CommandesController < Admin::BaseController
-  before_action :set_commande, only: [ :show, :update ]
+  before_action :set_commande, only: [ :show, :update, :destroy ]
 
   def index
     @commandes = Commande.includes(:table, ligne_commandes: :plat)
@@ -26,6 +26,17 @@ class Admin::CommandesController < Admin::BaseController
     end
   end
 
+
+  def destroy
+    if @commande.destroy
+      redirect_to admin_commandes_path,
+                  notice: "🗑️ Commande ##{@commande.id} supprimée avec succès"
+    else
+      redirect_to admin_commandes_path,
+                  alert: "❌ Erreur lors de la suppression de la commande"
+    end
+  end
+
   private
 
   def set_commande
@@ -34,6 +45,7 @@ class Admin::CommandesController < Admin::BaseController
 
 def commande_params
   params.require(:commande).permit(
+    :statut,
     :table_id,
     ligne_commandes_attributes: [ :plat_id, :quantite, :remarque, :sauces, :legumes, :supplements ]
   )

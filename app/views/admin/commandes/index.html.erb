@@ -101,6 +101,18 @@
           
           <%= link_to "👁️ Détails", admin_commande_path(commande), 
               class: "btn btn-secondary" %>
+          <!-- Bouton supprimer -->
+          <button type="button" class="btn btn-danger commande-delete-btn" data-id="<%= commande.id %>">
+            🗑️ Supprimer
+          </button>
+
+          <!-- Formulaire DELETE invisible -->
+          <%= form_with url: admin_commande_path(commande), method: :delete, local: true,
+                html: { id: "delete-form-#{commande.id}", style: "display: none;" } do |f| %>
+          <% end %>
+
+
+    
         </div>
       </div>
     <% end %>
@@ -147,4 +159,36 @@ document.addEventListener('DOMContentLoaded', function() {
     })
   })
 })
+// Confirmation pour la suppression
+document.addEventListener('turbo:load', function() {
+  document.querySelectorAll('.commande-delete-btn').forEach(btn => {
+    // Supprimer d'abord un éventuel ancien listener pour éviter double binding
+    btn.replaceWith(btn.cloneNode(true));
+  });
+
+  document.querySelectorAll('.commande-delete-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+      const commandeId = btn.dataset.id;
+      const form = document.getElementById(`delete-form-${commandeId}`);
+
+      Swal.fire({
+        title: 'Supprimer la commande',
+        text: `Voulez-vous vraiment supprimer la commande #${commandeId} ?`,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Oui, supprimer',
+        cancelButtonText: 'Annuler',
+        confirmButtonColor: '#e74c3c',
+        cancelButtonColor: '#6c757d'
+      }).then((result) => {
+        if (result.isConfirmed) {
+          form.submit(); // Rails gère le DELETE correctement
+        }
+      })
+    });
+  });
+});
+
+
+
 </script>

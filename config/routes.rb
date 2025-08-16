@@ -16,7 +16,7 @@ Rails.application.routes.draw do
   namespace :admin do
     root "dashboard#index"  # Cette ligne était manquante !
     resources :plats
-    resources :commandes, only: [ :index, :show, :update ] do
+    resources :commandes, only: [ :index, :show, :update, :destroy ] do
       collection do
         get :filter, path: "/", action: :index
       end
