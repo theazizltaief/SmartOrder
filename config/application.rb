@@ -23,5 +23,8 @@ module SmartOrder
     #
     # config.time_zone = "Central Time (US & Canada)"
     # config.eager_load_paths << Rails.root.join("extras")
+    # Utiliser le middleware des cookies et sessions aussi pour ActionCable
+    config.middleware.use ActionDispatch::Cookies
+    config.middleware.use ActionDispatch::Session::CookieStore
   end
 end

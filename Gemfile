@@ -65,3 +65,4 @@ gem "turbo-rails", "~> 2.0"
 gem "jsbundling-rails", "~> 1.3"
 
 gem "devise"
+gem "redis", "~> 5.0"

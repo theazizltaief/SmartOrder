@@ -47,6 +47,7 @@ def commande_params
   params.require(:commande).permit(
     :statut,
     :table_id,
+    :remarque_generale,
     ligne_commandes_attributes: [ :plat_id, :quantite, :remarque, :sauces, :legumes, :supplements ]
   )
 end

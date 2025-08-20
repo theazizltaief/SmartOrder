@@ -5,6 +5,8 @@
 import { application } from "./application"
 import panier_controller from "./panier_controller"
 import tags_controller from "./tags_controller"
+const channels = require.context(".", true, /_channel\.js$/)
+channels.keys().forEach(channels)
 
 application.register("panier", panier_controller)
 application.register("tags", tags_controller)
