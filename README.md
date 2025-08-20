@@ -22,3 +22,18 @@ Things you may want to cover:
 * Deployment instructions
 
 * ...
+# SmartOrder - Backend Rails
+
+## Projets liés
+- **Interface Admin Electron** : [lien-vers-repo-electron]
+
+## Installation
+```bash
+# bundle install
+# rails db:create db:migrate db:seed
+# rails server
+# Configuration
+
+# L'application Rails doit tourner sur http://localhost:3000 voir routes.rb
+# ActionCable configuré pour WebSocket sur /cable
+# Admin par défaut : admin@smartorder.com / password123
