@@ -44,10 +44,10 @@
     <% end %>
   </div>
   
-  <div style="margin-bottom: 1rem;">
+<div style="margin-bottom: 1rem;">
     <strong>Prix :</strong>
     <span style="font-size: 1.3rem; font-weight: 700; color: #e74c3c; margin-left: 0.5rem;">
-      <%= number_to_currency(@plat.prix_en_centimes / 100.0, unit: "", suffix: " DT") %>
+      <%= format_price_dt(@plat.prix_en_centimes) %>
     </span>
   </div>
   

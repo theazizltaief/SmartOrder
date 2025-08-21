@@ -32,7 +32,7 @@
       <h3>Commande #<%= @commande.id %> - Table <%= @commande.table.numero %></h3>
       <div class="commande-meta">
         📅 <%= l @commande.created_at, format: :short %>
-        • 💰 <%= number_to_currency(@commande.ligne_commandes.sum { |lc| lc.plat.prix_en_centimes * lc.quantite } / 100.0, unit: "", suffix: " DT") %>
+        • 💰 <%= format_price_dt(@commande.ligne_commandes.sum { |lc| lc.plat.prix_en_centimes * lc.quantite }) %>
       </div>
     </div>
     <div class="status-badge status-<%= @commande.statut %>">
@@ -53,7 +53,7 @@
           <% end %>
 
           <!-- Affichage des options -->
-          <% if lc.sauces.present? %>
+      <% if lc.sauces.present? %>
             <br><strong>Sauces :</strong> <%= lc.sauces.join(", ") %>
           <% end %>
           <% if lc.legumes.present? %>
@@ -64,10 +64,10 @@
           <% end %>
         </div>
         <div class="ligne-commande-prix">
-          <%= number_to_currency((lc.plat.prix_en_centimes * lc.quantite) / 100.0, unit: "", suffix: " DT") %>
+          <%= format_price_dt(lc.plat.prix_en_centimes * lc.quantite) %>
           <br>
           <small style="color: #7f8c8d;">
-            <%= number_to_currency(lc.plat.prix_en_centimes / 100.0, unit: "", suffix: " DT") %> × <%= lc.quantite %>
+            <%= format_price_dt(lc.plat.prix_en_centimes) %> × <%= lc.quantite %>
           </small>
         </div>
       </div>
@@ -75,7 +75,7 @@
     
     <div style="border-top: 2px solid #e9ecef; margin-top: 1rem; padding-top: 1rem; text-align: right;">
       <h3 style="color: #e74c3c;">
-        Total : <%= number_to_currency(@commande.ligne_commandes.sum { |lc| lc.plat.prix_en_centimes * lc.quantite } / 100.0, unit: "", suffix: " DT") %>
+        Total : <%= format_price_dt(@commande.ligne_commandes.sum { |lc| lc.plat.prix_en_centimes * lc.quantite }) %>
       </h3>
     </div>
   </div>

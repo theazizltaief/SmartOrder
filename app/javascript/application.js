@@ -2,6 +2,6 @@
 import "@hotwired/turbo-rails"
 import "./controllers"
 import "./cable"
-import "./channels"
+//import "./channels"
 
 console.log("Application JavaScript chargée")

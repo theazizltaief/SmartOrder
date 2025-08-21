@@ -34,10 +34,7 @@
     <div class="stat-label">Plats au menu</div>
   </div>
   
-  <div class="stat-card">
-    <div class="stat-number" style="color: #16a085;"><%= number_to_currency(@stats[:chiffre_affaires_jour], unit: "", suffix: " DT") %></div>
-    <div class="stat-label">CA aujourd'hui</div>
-  </div>
+
 </div>
 
 <div style="margin: 2rem 0;">
@@ -66,7 +63,7 @@
               <h3>Commande #<%= commande.id %> - Table <%= commande.table.numero %></h3>
               <div class="commande-meta">
                 📅 <%= l commande.created_at, format: :short %>
-                • 💰 <%= number_to_currency(commande.ligne_commandes.sum { |lc| lc.plat.prix_en_centimes * lc.quantite } / 100.0, unit: "", suffix: " DT") %>
+                • 💰 <%= format_price_dt(commande.ligne_commandes.sum { |lc| lc.plat.prix_en_centimes * lc.quantite }) %>
               </div>
             </div>
             <div class="status-badge status-<%= commande.statut %>">

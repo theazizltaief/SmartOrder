@@ -81,11 +81,12 @@
           <% end %>
         </div>
 
-        <div class="commande-actions" style="margin-top: 1rem; display: flex; gap: 1rem; align-items: center;">
+        <div class="commande-actions" style="margin-top: 1rem;">
+          <!-- Formulaire de mise à jour - prend toute la largeur sur mobile -->
           <%= form_with model: [:admin, commande], method: :patch, local: true, 
-              style: "flex: 1;", 
-              class: "commande-update-form" do |f| %>
-            <div style="display: flex; gap: 0.5rem; align-items: center;">
+              class: "commande-update-form",
+              style: "margin-bottom: 0.5rem;" do |f| %>
+            <div style="display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap;">
               <%= f.select :statut, 
                   options_for_select([
                     ['En attente', 'en_attente'],
@@ -94,25 +95,27 @@
                     ['Servie', 'servie']
                   ], commande.statut), 
                   {}, 
-                  { class: "form-control", style: "width: auto;" } %>
-              <%= f.submit "Mettre à jour", class: "btn btn-primary" %>
+                  { class: "form-control", style: "flex: 1; min-width: 120px;" } %>
+              <%= f.submit "Mettre à jour", class: "btn btn-primary", style: "white-space: nowrap;" %>
             </div>
           <% end %>
           
-          <%= link_to "👁️ Détails", admin_commande_path(commande), 
-              class: "btn btn-secondary" %>
-          <!-- Bouton supprimer -->
-          <button type="button" class="btn btn-danger commande-delete-btn" data-id="<%= commande.id %>">
-            🗑️ Supprimer
-          </button>
+          <!-- Conteneur pour les boutons Détails et Supprimer -->
+          <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+            <%= link_to "👁️ Détails", admin_commande_path(commande), 
+                class: "btn btn-secondary", style: "flex: 1; text-align: center; min-width: 100px;" %>
+            
+            <button type="button" class="btn btn-danger commande-delete-btn" 
+                    data-id="<%= commande.id %>"
+                    style="flex: 1; text-align: center; min-width: 100px;">
+              🗑️ Supprimer
+            </button>
+          </div>
 
           <!-- Formulaire DELETE invisible -->
           <%= form_with url: admin_commande_path(commande), method: :delete, local: true,
                 html: { id: "delete-form-#{commande.id}", style: "display: none;" } do |f| %>
           <% end %>
-
-
-    
         </div>
       </div>
     <% end %>
@@ -123,6 +126,42 @@
     </div>
   <% end %>
 </div>
+
+<style>
+/* CSS responsive pour les boutons des commandes */
+@media (max-width: 768px) {
+  .commande-actions {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 0.5rem !important;
+  }
+  
+  .commande-actions .commande-update-form div {
+    flex-wrap: wrap !important;
+  }
+  
+  .commande-actions .commande-update-form .form-control {
+    min-width: 100% !important;
+    margin-bottom: 0.5rem;
+  }
+  
+  .commande-actions .btn {
+    font-size: 0.9rem !important;
+    padding: 0.5rem 1rem !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .commande-actions div:last-of-type {
+    flex-direction: column !important;
+  }
+  
+  .commande-actions .btn {
+    width: 100% !important;
+    flex: none !important;
+  }
+}
+</style>
 
 <script>
 // Auto-refresh toutes les 30 secondes
