@@ -46,7 +46,13 @@
       class: "btn btn-secondary",
       form: { style: "display: inline;" } %>
 </div>
-
+<!-- bouton ajouter commande -->
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+  <h1>Gestion des Commandes</h1>
+  <%= link_to new_admin_commande_path, class: "btn btn-success", style: "display: flex; align-items: center; gap: 0.5rem;" do %>
+    ➕ <strong>Ajouter une commande</strong>
+  <% end %>
+</div>
 <!-- Liste des commandes -->
 <div class="commandes-list">
   <% if @commandes.any? %>

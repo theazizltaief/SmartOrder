@@ -23,7 +23,7 @@ Rails.application.routes.draw do
   namespace :admin do
     root "dashboard#index"
     resources :plats
-    resources :commandes, only: [ :index, :show, :update, :destroy ] do
+    resources :commandes do
       collection do
         get :filter, path: "/", action: :index
       end

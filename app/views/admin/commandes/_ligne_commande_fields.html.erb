@@ -1,0 +1,110 @@
+<!-- app/views/admin/commandes/_ligne_commande_fields.html.erb -->
+<div class="ligne-commande-item">
+  <button type="button" class="btn btn-danger btn-sm btn-remove-ligne">❌</button>
+  
+  <div class="row">
+    <!-- Sélection du plat -->
+    <div class="col-md-6">
+      <%= f.label :plat_id, "Plat", class: "form-label" %>
+      <%= f.select :plat_id, 
+          options_from_collection_for_select(plats, :id, :nom, f.object.plat_id),
+          { prompt: "Choisir un plat..." }, 
+          { class: "form-control", required: true } %>
+    </div>
+    
+    <!-- Quantité -->
+    <div class="col-md-2">
+      <%= f.label :quantite, "Qté", class: "form-label" %>
+      <%= f.number_field :quantite, 
+          class: "form-control", 
+          value: f.object.quantite || 1, 
+          min: 1, 
+          required: true %>
+    </div>
+    
+    <!-- Prix unitaire (affiché dynamiquement) -->
+    <div class="col-md-4">
+      <label class="form-label">Prix unitaire</label>
+      <div class="form-control-plaintext prix-unitaire" style="font-weight: bold; color: #e74c3c;">
+        <span class="prix-display">Sélectionner un plat</span>
+      </div>
+    </div>
+  </div>
+  
+  <div class="row" style="margin-top: 1rem;">
+    <!-- Remarque -->
+    <div class="col-md-12">
+      <%= f.label :remarque, "Remarque", class: "form-label" %>
+      <%= f.text_area :remarque, 
+          class: "form-control", 
+          rows: 2, 
+          placeholder: "Remarque pour cet article..." %>
+    </div>
+  </div>
+  
+  <!-- Sauces, Légumes, Suppléments -->
+  <div class="row" style="margin-top: 1rem;">
+    <div class="col-md-4">
+      <%= f.label :sauces_text, "Sauces", class: "form-label" %>
+      <%= f.text_field :sauces_text, 
+          class: "form-control", 
+          placeholder: "Ex: Ketchup, Mayo" %>
+      <small class="form-text text-muted">Séparer par des virgules</small>
+    </div>
+    
+    <div class="col-md-4">
+      <%= f.label :legumes_text, "Légumes", class: "form-label" %>
+      <%= f.text_field :legumes_text, 
+          class: "form-control", 
+          placeholder: "Ex: Salade, Tomate" %>
+      <small class="form-text text-muted">Séparer par des virgules</small>
+    </div>
+    
+    <div class="col-md-4">
+      <%= f.label :supplements_text, "Suppléments", class: "form-label" %>
+      <%= f.text_field :supplements_text, 
+          class: "form-control", 
+          placeholder: "Ex: Fromage, Avocat" %>
+      <small class="form-text text-muted">Séparer par des virgules</small>
+    </div>
+  </div>
+  
+  <%= f.hidden_field :_destroy, value: '0' %>
+</div>
+
+<script>
+// Script pour mettre à jour le prix quand on change de plat
+document.addEventListener('DOMContentLoaded', function() {
+  function updatePrixUnitaire(selectElement) {
+    const prixDisplay = selectElement.closest('.ligne-commande-item').querySelector('.prix-display');
+    const selectedPlatId = selectElement.value;
+    
+    // Utiliser les données du parent (window.platsData)
+    if (selectedPlatId && window.platsData) {
+      const plat = window.platsData.find(p => p.id == selectedPlatId);
+      if (plat) {
+        // Format prix tunisien
+        const prixFormate = (plat.prix / 1000).toLocaleString('fr-FR', {
+          minimumFractionDigits: 3,
+          maximumFractionDigits: 3
+        }) + ' DT';
+        prixDisplay.textContent = prixFormate;
+      }
+    } else {
+      prixDisplay.textContent = 'Sélectionner un plat';
+    }
+  }
+  
+  // Attacher l'event listener à tous les selects de plats existants et futurs
+  document.addEventListener('change', function(e) {
+    if (e.target.matches('select[name*="plat_id"]')) {
+      updatePrixUnitaire(e.target);
+    }
+  });
+  
+  // Initialiser les prix pour les lignes existantes
+  setTimeout(function() {
+    document.querySelectorAll('select[name*="plat_id"]').forEach(updatePrixUnitaire);
+  }, 100);
+});
+</script>

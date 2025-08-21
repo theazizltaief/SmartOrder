@@ -1,0 +1,179 @@
+<!-- app/views/admin/commandes/new.html.erb -->
+<div class="container-fluid" style="padding: 2rem;">
+  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+    <h1>➕ Nouvelle Commande</h1>
+    <%= link_to admin_commandes_path, class: "btn btn-secondary" do %>
+      ← Retour aux commandes
+    <% end %>
+  </div>
+
+  <%= form_with model: [:admin, @commande], local: true, id: "nouvelle-commande-form" do |f| %>
+    <div class="row">
+      <!-- Informations générales -->
+      <div class="col-md-4">
+        <div class="card" style="margin-bottom: 2rem;">
+          <div class="card-header">
+            <h5>🏷️ Informations générales</h5>
+          </div>
+          <div class="card-body">
+            <div class="form-group" style="margin-bottom: 1rem;">
+              <%= f.label :table_id, "Table", class: "form-label" %>
+              <%= f.select :table_id, 
+                  options_from_collection_for_select(@tables, :id, :nom_complet, @commande.table_id),
+                  { prompt: "Choisir une table..." }, 
+                  { class: "form-control", required: true } %>
+            </div>
+
+            <div class="form-group">
+              <%= f.label :remarque_generale, "Remarque générale", class: "form-label" %>
+              <%= f.text_area :remarque_generale, 
+                  class: "form-control", 
+                  rows: 3, 
+                  placeholder: "Remarque pour toute la commande..." %>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Lignes de commande -->
+      <div class="col-md-8">
+        <div class="card">
+          <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
+            <h5>🍽️ Articles de la commande</h5>
+            <button type="button" id="ajouter-ligne" class="btn btn-primary btn-sm">
+              ➕ Ajouter un article
+            </button>
+          </div>
+          <div class="card-body">
+            <div id="lignes-commande">
+              <%= f.fields_for :ligne_commandes do |lc_form| %>
+                <%= render 'ligne_commande_fields', f: lc_form, plats: @plats %>
+              <% end %>
+            </div>
+
+            <!-- Template pour nouvelles lignes (caché) -->
+            <template id="ligne-commande-template">
+              <%= f.fields_for :ligne_commandes, LigneCommande.new, child_index: 'NEW_RECORD' do |lc_form| %>
+                <%= render 'ligne_commande_fields', f: lc_form, plats: @plats %>
+              <% end %>
+            </template>
+          </div>
+        </div>
+
+        <!-- Total et actions -->
+        <div style="margin-top: 2rem; text-align: right;">
+          <div id="total-commande" style="font-size: 1.2rem; font-weight: bold; margin-bottom: 1rem; color: #e74c3c;">
+            Total : <span id="montant-total">0,000 DT</span>
+          </div>
+
+          <div style="display: flex; gap: 1rem; justify-content: flex-end;">
+            <%= link_to admin_commandes_path, class: "btn btn-secondary" do %>
+              ❌ Annuler
+            <% end %>
+            <%= f.submit "✅ Créer la commande", class: "btn btn-success", style: "font-weight: bold;" %>
+          </div>
+        </div>
+      </div>
+    </div>
+  <% end %>
+</div>
+
+<style>
+.ligne-commande-item {
+  border: 1px solid #dee2e6;
+  border-radius: 8px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  background-color: #f8f9fa;
+}
+
+.ligne-commande-item:last-child {
+  margin-bottom: 0;
+}
+
+.btn-remove-ligne {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+}
+
+.ligne-commande-item {
+  position: relative;
+}
+
+@media (max-width: 768px) {
+  .row {
+    flex-direction: column;
+  }
+  
+  .col-md-4, .col-md-8 {
+    width: 100%;
+    margin-bottom: 1rem;
+  }
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  let ligneIndex = window.ligneIndex || 0;
+  const lignesContainer = document.getElementById('lignes-commande');
+  const template = document.getElementById('ligne-commande-template');
+  
+  // Ajouter une nouvelle ligne
+  document.getElementById('ajouter-ligne').addEventListener('click', function() {
+    const newLigne = template.content.cloneNode(true);
+    const html = newLigne.querySelector('div').outerHTML.replace(/NEW_RECORD/g, ligneIndex);
+    lignesContainer.insertAdjacentHTML('beforeend', html);
+    ligneIndex++;
+    
+    // Réattacher les event listeners
+    attachEventListeners();
+    calculerTotal();
+  });
+  
+  // Fonction pour attacher les event listeners
+  function attachEventListeners() {
+    // Boutons supprimer
+    document.querySelectorAll('.btn-remove-ligne').forEach(btn => {
+      btn.addEventListener('click', function() {
+        this.closest('.ligne-commande-item').remove();
+        calculerTotal();
+      });
+    });
+    
+    // Changements de quantité et plat
+    document.querySelectorAll('select[name*="plat_id"], input[name*="quantite"]').forEach(input => {
+      input.addEventListener('change', calculerTotal);
+    });
+  }
+  
+  // Calculer le total
+  function calculerTotal() {
+    let total = 0;
+    
+    document.querySelectorAll('.ligne-commande-item').forEach(ligne => {
+      const platSelect = ligne.querySelector('select[name*="plat_id"]');
+      const quantiteInput = ligne.querySelector('input[name*="quantite"]');
+      
+      if (platSelect && quantiteInput && platSelect.value && quantiteInput.value) {
+        const plat = window.platsData.find(p => p.id == platSelect.value);
+        if (plat) {
+          total += plat.prix * parseInt(quantiteInput.value || 0);
+        }
+      }
+    });
+    
+    // Formatage du prix (centimes vers DT avec 3 décimales)
+    const totalFormate = (total / 1000).toLocaleString('fr-FR', {
+      minimumFractionDigits: 3,
+      maximumFractionDigits: 3
+    }) + ' DT';
+    
+    document.getElementById('montant-total').textContent = totalFormate;
+  }
+  
+  // Initialiser
+  attachEventListeners();
+  calculerTotal();
+});
+</script>
