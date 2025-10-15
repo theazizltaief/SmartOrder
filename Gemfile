@@ -66,3 +66,4 @@ gem "jsbundling-rails", "~> 1.3"
 
 gem "devise"
 gem "redis", "~> 5.0"
+gem 'acts-as-taggable-on', github: 'mbleigh/acts-as-taggable-on', branch: 'master'

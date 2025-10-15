@@ -1,13 +1,15 @@
 import consumer from "./consumer"
 
-consumer.subscriptions.create("CommandesChannel", {
+consumer.subscriptions.create("OrdersChannel", {
   connected() {
-    console.log("✅ Connecté à CommandesChannel (Rails côté navigateur)")
+    console.log("✅ [Browser] Connecté à OrdersChannel")
   },
+  
   disconnected() {
-    console.log("❌ Déconnecté de CommandesChannel")
+    console.log("⚠️ [Browser] Déconnecté de OrdersChannel")
   },
+  
   received(data) {
-    console.log("📩 Donnée reçue :", data)
+    console.log("📩 [Browser] Commande reçue :", data)
   }
 })
